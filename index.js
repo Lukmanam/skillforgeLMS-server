@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cors from 'cors'
 import studentRoute from './routes/studentRoute.js';
 import instructorRoute from './routes/instructorRoute.js';
+import adminRoute from './routes/adminRoute.js';
 dotenv.config();
 const app=express()
 const PORT=process.env.PORT ||3000;
@@ -18,6 +19,7 @@ const corsoptions={
 }
 
 app.use(cors(corsoptions))
+app.use('/admin',adminRoute)
 app.use('/instructor',instructorRoute)
 app.use('/',studentRoute);
 

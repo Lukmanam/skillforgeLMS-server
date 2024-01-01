@@ -10,7 +10,7 @@ import mongoose from "mongoose";
     },
     phone:{
         type:Number,
-        required:true
+        
     },
     password:{
         type:String,

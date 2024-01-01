@@ -11,8 +11,7 @@ email:{
     required:true
 },
 phone:{
-    type:Number,
-    required:true
+    type:Number
 },
 password:{
     type:String,

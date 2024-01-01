@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const otpSchema= new mongoose.Schema({
- userId:mongoose.Types.ObjectId,
+ studentId:mongoose.Types.ObjectId,
  otp:String,
  createdAt:Date,
  expiresAt:Date   
