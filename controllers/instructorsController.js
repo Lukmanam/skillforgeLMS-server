@@ -1,7 +1,8 @@
 import Instructor from '../models/instructorModel.js'
 import securePassword from '../utilities/securePassword.js';
-import {sendMailOtp} from '../utilities/otpControl.js';
+import { sendMailOtp } from '../utilities/otpControl.js';
 import { sendResetpasswordIns } from '../utilities/otpControl.js';
+import Course from "../models/courseModel.js";
 import Otp from '../models/otpModel.js';
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
@@ -16,7 +17,7 @@ export const registerInstructor = async (req, res) => {
     try {
         const { name, email, phone, password } = req.body;
         const emailexist = await Instructor.findOne({ email: email })
-        const hashedPassword=await securePassword(password)
+        const hashedPassword = await securePassword(password)
         if (emailexist) {
             return res
                 .status(401)
@@ -30,11 +31,11 @@ export const registerInstructor = async (req, res) => {
                 password: hashedPassword
             })
             const instructorData = await instructor.save();
-            otpId=await sendMailOtp(instructor.name, instructor.email,instructor._id)
+            otpId = await sendMailOtp(instructor.name, instructor.email, instructor._id)
             console.log(instructorData, "this is instructor data");
             return res
                 .status(201)
-                .json({message: `otp Has been send to ${email}`,instructor:instructorData,otpId:otpId })
+                .json({ message: `otp Has been send to ${email}`, instructor: instructorData, otpId: otpId })
         }
 
 
@@ -51,7 +52,7 @@ export const instructorEmailOtpVerification = async (req, res) => {
         const { otp, instructorId } = req.body;
         console.log("instructorId =", instructorId);
         console.log("OTP=", otp);
-        const otpData = await Otp.find({ studentId:instructorId });
+        const otpData = await Otp.find({ studentId: instructorId });
         console.log(otpData);
         const { expiresAt } = otpData[otpData.length - 1];
         console.log(expiresAt, "This is expiry");
@@ -104,45 +105,43 @@ export const resendInstructorOtp = async (req, res) => {
 }
 
 
-export const InstructorLogin=async(req,res)=>{
+export const InstructorLogin = async (req, res) => {
     try {
-        const {email,password}=req.body;
-        const instructor=await Instructor.findOne({email:email});
+        const { email, password } = req.body;
+        const instructor = await Instructor.findOne({ email: email });
         console.log(instructor);
 
-        if(instructor)
-        {
-            const correctPassword=await bcrypt.compare(password,instructor.password)
-            console.log(correctPassword,"password correct");
-            if ( instructor.is_blocked===false) {
-                if(correctPassword){
-                    const token=jwt.sign(
+        if (instructor) {
+            const correctPassword = await bcrypt.compare(password, instructor.password)
+            console.log(correctPassword, "password correct");
+            if (instructor.is_blocked === false) {
+                if (correctPassword) {
+                    const token = jwt.sign(
                         {
-                            name:instructor.name,
-                            email:instructor.email,
-                            id:instructor._id,
-                            role:"instructor"
+                            name: instructor.name,
+                            email: instructor.email,
+                            id: instructor._id,
+                            role: "instructor"
                         },
                         process.env.INSTRUCTOR_SECRET,
-                        {expiresIn:"1h"}
+                        { expiresIn: "1h" }
                     );
                     console.log(token);
-                    res.status(200).json({instructor,token,message:`welcome ${instructor.name}`})
+                    res.status(200).json({ instructor, token, message: `welcome ${instructor.name}` })
                 }
-                else{
-                    res.status(403).json({message:"Invalid Credentials"})
+                else {
+                    res.status(403).json({ message: "Invalid Credentials" })
 
                 }
             }
-            else
-            {
-                res.status(403).json({message:"oops!! YourAccount has been Suspended"})
+            else {
+                res.status(403).json({ message: "oops!! YourAccount has been Suspended" })
             }
         }
-        
+
     } catch (error) {
         console.log(error.message);
-        res.status(500).json({status:"Internal Server Error"})  
+        res.status(500).json({ status: "Internal Server Error" })
     }
 }
 
@@ -172,10 +171,10 @@ export const instructorforgotpassword = async (req, res) => {
 export const changePassword = async (req, res) => {
     try {
         console.log("helo trying to change instructor Password");
-        const {id,newPassword}=req.body
+        const { id, newPassword } = req.body
         const hashedPassword = await securePassword(newPassword)
-        console.log(id,"this is instructor Id");
-        console.log(newPassword,"this NEW Paswword");
+        console.log(id, "this is instructor Id");
+        console.log(newPassword, "this NEW Paswword");
 
         const instructorData = await Instructor.findByIdAndUpdate({ _id: id }, { $set: { password: hashedPassword } });
         console.log("password has been changed in Instructor ");
@@ -188,47 +187,119 @@ export const changePassword = async (req, res) => {
 
 
 
-export const googleSignins=async(req,res)=>{
+export const googleSignins = async (req, res) => {
     try {
         console.log("In Google signin");
-        const userData=req.body.user
-        const {email,displayName}=userData;
-        const instructorData=await Instructor.findOne({email:email})
-        if(instructorData){
-            const token=jwt.sign({id:instructorData._id},process.env.INSTRUCTOR_SECRET);
-            const {password:pass, ...rest}=instructorData._doc;
+        const userData = req.body.user
+        const { email, displayName } = userData;
+        const instructorData = await Instructor.findOne({ email: email })
+        if (instructorData) {
+            const token = jwt.sign({ id: instructorData._id }, process.env.INSTRUCTOR_SECRET);
+            const { password: pass, ...rest } = instructorData._doc;
             console.log("Instructor Can Login");
 
             res.status(200)
-            .json({instructorData,token,message:`Welcome Back ${instructorData.name}`})
+                .json({ instructorData, token, message: `Welcome Back ${instructorData.name}` })
         }
-        else
-        {
-            const autoPassword=Math.random().toString(36).slice(-8) +Math.random().toString(36).slice(-8);
-            const hashedPassword=await securePassword(autoPassword);
+        else {
+            const autoPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+            const hashedPassword = await securePassword(autoPassword);
             const instructor = new Instructor({
                 name: displayName,
                 email: email,
                 password: hashedPassword
             })
-            const newInstructor=await instructor.save();
-            const instructorData=await Instructor.findOne({email:email})
-            console.log(instructorData.email,"this is email");
-            const changed=await Instructor.findOneAndUpdate({email:instructorData.email},{$set:{is_verified:true}})
-            console.log(changed,"NEW INSTRUCTOR DATA");
-            const token= jwt.sign({id:instructor._id},process.env.INSTRUCTOR_SECRET);
+            const newInstructor = await instructor.save();
+            const instructorData = await Instructor.findOne({ email: email })
+            console.log(instructorData.email, "this is email");
+            const changed = await Instructor.findOneAndUpdate({ email: instructorData.email }, { $set: { is_verified: true } })
+            console.log(changed, "NEW INSTRUCTOR DATA");
+            const token = jwt.sign({ id: instructor._id }, process.env.INSTRUCTOR_SECRET);
             console.log("New User Registered with Google Account");
-            const {password:pass,...rest}=instructor._doc;
-           res.status(200).json({instructorData,token,message:`Welcome  ${newInstructor.name}`})
+            const { password: pass, ...rest } = instructor._doc;
+            res.status(200).json({ instructorData, token, message: `Welcome  ${newInstructor.name}` })
 
         }
     } catch (error) {
 
-        res.status(500).json({message:"Internal Server Error"})
-        console.log(error); 
-        
+        res.status(500).json({ message: "Internal Server Error" })
+        console.log(error);
+
     }
 }
+
+export const myCourses = async (req, res) => {
+    try {
+
+        const { instructorId } = req.params
+        console.log("in backend", instructorId);
+        const courses = await Course.find({ instructorId: instructorId }).populate('category');
+        if (courses) {
+            console.log(courses, "this is populated Course");
+            res.status(200).json({ courses })
+        }
+    } catch (error) {
+        console.log(error);
+
+    }
+
+}
+
+
+export const fetchCouseData = async (req, res) => {
+    try {
+        console.log(req.params, "body ");
+        const { courseId } = req.params
+        console.log(courseId);
+        const courseData = await Course.findOne({ _id: courseId }).populate('category').populate('modules.module');
+        console.log(courseData);
+        res.status(200).json({ message: "course data fetched Successfully", courseData })
+
+    } catch (error) {
+        console.log(error);
+
+    }
+
+}
+
+export const changeListStatus = async (req, res) => {
+    console.log("haaai")
+    const { courseId } = req.body;
+    console.log(courseId);
+    const courseDetail = await Course.findOne({ _id: courseId })
+  
+    if(courseDetail?.is_Listed===true)
+    {
+    await Course.findByIdAndUpdate({_id:courseId},{$set:{ is_Listed:false}})
+    const is_Listed=false;
+    res?.status(200).json({message:"Listing Stopped temporarily", is_Listed})
+    }
+    else
+    {
+        await Course.findByIdAndUpdate({_id:courseId},{$set:{ is_Listed:true}});
+        const is_Listed=false;
+        res?.status(200).json({message:"Course Listed Successfully",is_Listed})
+    }
+}
+
+export const checkListStatus=async(req,res)=>{
+    try {
+        const {courseId}=req.params
+        console.log(courseId,"checking List status")
+        const courseData=await Course.findOne({_id:courseId})
+        const status=courseData?.is_Listed
+        console.log(status);
+        res?.status(200).json({status})
+        
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+
+
+
 
 
 
