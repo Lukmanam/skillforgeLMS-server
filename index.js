@@ -6,12 +6,15 @@ import studentRoute from './routes/studentRoute.js';
 import instructorRoute from './routes/instructorRoute.js';
 import adminRoute from './routes/adminRoute.js';
 dotenv.config();
+
 const app=express()
 const PORT=process.env.PORT ||3000;
+app.use(express.json({ limit: '50mb' })); // Adjust the limit as needed for JSON data
+app.use(express.urlencoded({ limit: '50mb', extended: true })); // Adjust the limit as needed for URL-encoded data
 
 dbconnect();
-app.use(express.urlencoded({extended:true}))
-app.use(express.json())
+// app.use(express.urlencoded({extended:true}))
+// app.use(express.json())
 const corsoptions={
     origin: 'http://localhost:5173',
   methods: ['GET', 'POST', 'PUT', 'PATCH'],
