@@ -26,7 +26,18 @@ isBlocked:{
     type:Boolean,
     default:false
 
-}
+},
+enrolledCourse:[
+    {
+        course:{
+            type:mongoose.Types.ObjectId,
+            ref:'course'
+        }
+    }
+]
+
+
+
 
 })
 
