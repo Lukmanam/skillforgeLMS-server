@@ -258,62 +258,25 @@ export const allCategories = async (req, res) => {
 
 }
 
+export const allCategoryCoursePage=async(req,res)=>{
+    const categories = await Category.find({ isBlocked: false });
+    console.log(categories);
+    res.status(200).json({ message: "Categories for Students", categories })
+}
+
 export const allCourses = async (req, res) => {
     const courses = await Course.find({ isApproved: true, is_Listed: true }).populate('instructorId')
     res.status(200).json({ message: "All courses fetched", courses })
     console.log(courses, "these are Courses");
 }
-// export const addtoFavCourses = async (req, res) => {
-//     try {
-//         console.log("Hai");
-//         const { courseId, studentId } = req.body
-//         console.log(req.body, "this is request body");
-//         const alreadyexist = await SavedCourse.findOne({ studentId: studentId, courseId: courseId });
-//         if (alreadyexist) {
-//             if (alreadyexist.courseId == courseId) {
-//                 await SavedCourse.deleteOne({ courseId: courseId, studentId: studentId });
-//                 res.status(200).json({ message: "Removed from favourites" })
-//             }
-//         }
-//         else {
-//             const savedCourses = new SavedCourse({
-//                 courseId: courseId,
-//                 studentId: studentId
-//             });
-//             await savedCourses.save();
-//             res.status(201).json({ message: "Added to Favourites" })
-//         }
-//     } catch (error) {
-//         console.log(error);
 
-//     }
-// }
+export const allCourseslist=async(req,res)=>{
+    const courses = await Course.find({ isApproved: true, is_Listed: true }).populate('instructorId')
+    res.status(200).json({ message: "All courses page courses", courses })
+    console.log(courses, "all courses list page");
 
-// export const checkfavouriteStatus = async (req, res) => {
-//     try {
-//         const { courseId, studentId } = req.body;
-//         console.log(req.body, "in backendfor check favourite");
-//         console.log(SavedCourse);
-//         const alreadyexist = await SavedCourse.find({ studentId: studentId});
-//         console.log(alreadyexist);
-//         if (alreadyexist) {
-//             console.log("student id und");
-//             console.log("okcj");
-//             if (alreadyexist.courseId == courseId) {
-//                 let favorite = true;
-//                 console.log("favourited aan");
-//                 res.status(200).json({ message: "checked for favourite or not", favorite })
-//             }
-//         }
-//         else {
-//             let favorite = false
-//             console.log(favorite);
-//             res.status(200).json({ message: "checked for favourite or not", favorite })
-//         }
-//     } catch (error) {
-//         console.log(error);
-//     }
-// }
+}
+
 
 export const addtoFavCourses = async (req, res) => {
     try {
@@ -337,9 +300,12 @@ export const addtoFavCourses = async (req, res) => {
 export const checkfavouriteStatus = async (req, res) => {
     try {
         const { courseId, studentId } = req.body;
-        const alreadyexist = await SavedCourse.find({ studentId });
+        const alreadyexist = await SavedCourse.findOne({ studentId:studentId ,_id:courseId });
+        console.log(alreadyexist);
 
-        if (alreadyexist(course => course.courseId === courseId)) {
+        if (alreadyexist)
+        {
+        (course => course.courseId === courseId) 
             res.status(200).json({ message: "Checked for favourite or not", favorite: true });
         } else {
             res.status(200).json({ message: "Checked for favourite or not", favorite: false });
@@ -436,6 +402,23 @@ export const fetchEnrolledCourse = async (req, res) => {
     }
 }
 
+
+export const editStudentProfile=async(req,res)=>{
+    try {
+        console.log(req.body);
+        const {studentId}=req.body;
+        const {name,phone,email}=req.body.values
+        console.log(name,phone,studentId);
+        const update=await Student.findByIdAndUpdate({_id:studentId},{$set:{name:name,phone:phone}})
+        console.log(update);
+        const updatedprofile=await Student.findOne({_id:studentId});
+        console.log(updatedprofile);
+        res.status(200).json({message:"success",updatedprofile})
+        
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 
 

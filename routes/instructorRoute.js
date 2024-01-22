@@ -16,6 +16,8 @@ import {changeListStatus}  from '../controllers/instructorsController.js'
 import {checkListStatus}  from '../controllers/instructorsController.js'
 import {getCourseDetails} from '../controllers/courseController.js'
 import { editCourse } from '../controllers/courseController.js';
+import {EditinstructorProfile} from '../controllers/instructorsController.js';
+
 
 const instructorRoute = express.Router()
 instructorRoute.post('/signup', registerInstructor)
@@ -34,7 +36,8 @@ instructorRoute.post('/deleteModule',deleteModule)
 instructorRoute.post('/changeListStatus',changeListStatus)
 instructorRoute.get('/checkListStatus/:courseId',checkListStatus)
 instructorRoute.get('/getCourseDetails/:courseId',getCourseDetails)
-instructorRoute.patch('/editCourse',editCourse)
+instructorRoute.patch('/editCourse',editCourse);
+instructorRoute.post('/profileData',EditinstructorProfile)
  
 
 

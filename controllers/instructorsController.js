@@ -267,36 +267,45 @@ export const changeListStatus = async (req, res) => {
     const { courseId } = req.body;
     console.log(courseId);
     const courseDetail = await Course.findOne({ _id: courseId })
-  
-    if(courseDetail?.is_Listed===true)
-    {
-    await Course.findByIdAndUpdate({_id:courseId},{$set:{ is_Listed:false}})
-    const is_Listed=false;
-    res?.status(200).json({message:"Listing Stopped temporarily", is_Listed})
+
+    if (courseDetail?.is_Listed === true) {
+        await Course.findByIdAndUpdate({ _id: courseId }, { $set: { is_Listed: false } })
+        const is_Listed = false;
+        res?.status(200).json({ message: "Listing Stopped temporarily", is_Listed })
     }
-    else
-    {
-        await Course.findByIdAndUpdate({_id:courseId},{$set:{ is_Listed:true}});
-        const is_Listed=false;
-        res?.status(200).json({message:"Course Listed Successfully",is_Listed})
+    else {
+        await Course.findByIdAndUpdate({ _id: courseId }, { $set: { is_Listed: true } });
+        const is_Listed = false;
+        res?.status(200).json({ message: "Course Listed Successfully", is_Listed })
     }
 }
 
-export const checkListStatus=async(req,res)=>{
+export const checkListStatus = async (req, res) => {
     try {
-        const {courseId}=req.params
-        console.log(courseId,"checking List status")
-        const courseData=await Course.findOne({_id:courseId})
-        const status=courseData?.is_Listed
+        const { courseId } = req.params
+        console.log(courseId, "checking List status")
+        const courseData = await Course.findOne({ _id: courseId })
+        const status = courseData?.is_Listed
         console.log(status);
-        res?.status(200).json({status})
-        
+        res?.status(200).json({ status })
+
     } catch (error) {
         console.log(error);
     }
 }
 
 
+
+export const EditinstructorProfile = async (req, res) => {
+    console.log(req.body);
+    const { instructorId, name, phone } = req.body
+
+    console.log(instructorId, name, phone);
+
+    await Instructor.updateOne({ _id: instructorId }, { $set: { name: name, phone: phone } })
+    const updatedInstructor = await Instructor.findById({_id:instructorId})
+    res.status(200).json({ message: "success", updatedInstructor, })
+}
 
 
 
