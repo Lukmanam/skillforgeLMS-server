@@ -1,7 +1,9 @@
 import Course from "../models/courseModel.js";
 import Category from "../models/categoryModel.js";
 import cloudinary from "../utilities/cloudinary.js";
-import Modules from "../models/ModulesModel.js"
+import Modules from "../models/ModulesModel.js";
+import stripe from "stripe";
+
 
 
 
@@ -162,6 +164,48 @@ export const editCourse = async (req, res) => {
         console.log(error);
     }
 }
+
+
+
+export const paymentCheckout = async (req, res) => {
+    const stripeInstance = stripe('sk_test_51OFr1pSB3NLla9eM1vE5JuNyD4fIMDGfyLEn6WZoaJNUzhZhKMzONjIuZWEQj8DZyprUuykNLJIRxWLXiadQgYqe00HEwuW6rM')
+    console.log(req.body,"this is whole Body");
+    const course = req.body.courseData
+
+    const lineItems = [
+        {
+            price_data: {
+                currency: "inr",
+                product_data: {
+                    name: course.courseName,
+                },
+                unit_amount: course.price*100
+            },
+
+            quantity: 1,
+        }
+    ];
+
+    const session = await stripeInstance.checkout.sessions.create({
+        payment_method_types:["card"],
+        line_items: lineItems,
+        mode:"payment",
+        success_url:`http://localhost:5173/enrollSuccess/${course._id}`,
+        cancel_url:`http://localhost:5173/CourseDetails/${course._id}`,
+        // customer_email: "test@example.com", // Use a dummy email for testing
+        // billing_address_collection: "auto"
+
+    });
+
+    console.log(session,"this is sessioon");
+    res.json({id:session.id})
+
+    console.log(course, "this is course Data which is Enrollinggggggggggggggggggggggg");
+
+}
+
+
+
 
 
 
