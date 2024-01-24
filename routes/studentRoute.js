@@ -11,6 +11,12 @@ import { editStudentProfile } from '../controllers/studentController.js';
 import { allCourseslist } from '../controllers/studentController.js';
 import { allCategoryCoursePage } from '../controllers/studentController.js';
 import { paymentCheckout } from '../controllers/courseController.js';
+import { learnCourse } from '../controllers/studentController.js';
+import { saveProgress } from '../controllers/courseController.js';
+import { alreadyCompletedModules } from '../controllers/courseController.js';
+import { rateCourse } from '../controllers/studentController.js';
+import { checkratingStatus } from '../controllers/studentController.js';
+import { fetchCourseRating } from '../controllers/studentController.js';
 import express from 'express'
 
 const studentRoute=express();
@@ -34,7 +40,12 @@ studentRoute.post('/checkEnrollment',checkEnrollment)
 studentRoute.get('/EnrolledCourse/:studentId',fetchEnrolledCourse)
 studentRoute.post('/editStudentProfile',editStudentProfile)
 studentRoute.post('/paymentCheckoutSesion',paymentCheckout)
-
+studentRoute.get('/learnCourse/:courseId',learnCourse);
+studentRoute.post('/saveCourseProgress',saveProgress)
+studentRoute.get('/alreadyCompletedModules',alreadyCompletedModules)
+studentRoute.post('/rateCourse',rateCourse)
+studentRoute.get('/checkratingStatus',checkratingStatus)
+studentRoute.get('/fetchCourseRating/:courseId',fetchCourseRating)
 
 
 

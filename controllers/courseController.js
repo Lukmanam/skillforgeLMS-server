@@ -2,6 +2,7 @@ import Course from "../models/courseModel.js";
 import Category from "../models/categoryModel.js";
 import cloudinary from "../utilities/cloudinary.js";
 import Modules from "../models/ModulesModel.js";
+import EnrolledCourse from '../models/enrolledCourseModel.js';
 import stripe from "stripe";
 
 
@@ -169,7 +170,7 @@ export const editCourse = async (req, res) => {
 
 export const paymentCheckout = async (req, res) => {
     const stripeInstance = stripe('sk_test_51OFr1pSB3NLla9eM1vE5JuNyD4fIMDGfyLEn6WZoaJNUzhZhKMzONjIuZWEQj8DZyprUuykNLJIRxWLXiadQgYqe00HEwuW6rM')
-    console.log(req.body,"this is whole Body");
+    console.log(req.body, "this is whole Body");
     const course = req.body.courseData
 
     const lineItems = [
@@ -179,7 +180,7 @@ export const paymentCheckout = async (req, res) => {
                 product_data: {
                     name: course.courseName,
                 },
-                unit_amount: course.price*100
+                unit_amount: course.price * 100
             },
 
             quantity: 1,
@@ -187,20 +188,41 @@ export const paymentCheckout = async (req, res) => {
     ];
 
     const session = await stripeInstance.checkout.sessions.create({
-        payment_method_types:["card"],
+        payment_method_types: ["card"],
         line_items: lineItems,
-        mode:"payment",
-        success_url:`http://localhost:5173/enrollSuccess/${course._id}`,
-        cancel_url:`http://localhost:5173/CourseDetails/${course._id}`,
+        mode: "payment",
+        success_url: `http://localhost:5173/enrollSuccess/${course._id}`,
+        cancel_url: `http://localhost:5173/CourseDetails/${course._id}`,
         // customer_email: "test@example.com", // Use a dummy email for testing
         // billing_address_collection: "auto"
 
     });
 
-    console.log(session,"this is sessioon");
-    res.json({id:session.id})
+    console.log(session, "this is sessioon");
+    res.json({ id: session.id })
 
     console.log(course, "this is course Data which is Enrollinggggggggggggggggggggggg");
+
+}
+
+
+
+
+export const saveProgress = async (req, res) => {
+    console.log(req.body, "saving Progreess of learning");
+    const { courseId, studentId, moduleId } = req.body;
+    // const alreadyexist=await EnrolledCourse.findOne({studentId:studentId,courseId:courseId})
+    const progress = await EnrolledCourse.findOneAndUpdate({ studentId: studentId, courseId: courseId }, { $push: { Progress: moduleId } })
+    console.log(progress);
+
+}
+
+export const alreadyCompletedModules=async(req,res)=>{
+    const courseId = req.query.courseId;
+    const studentId = req.query.studentId;
+    const modulesCompleted=await EnrolledCourse.findOne({courseId:courseId,studentId:studentId});
+    console.log(modulesCompleted);
+    res.status(200).json({modulesCompleted})
 
 }
 
