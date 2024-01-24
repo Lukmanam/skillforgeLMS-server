@@ -12,9 +12,18 @@ const enrolledSchema=new mongoose.Schema({
         ref:"student",
         required:true
     },
+    Progress:{
+        type:Array,
+        ref:'module'
+    },
     enrolledAt:{
         type:Date,
         default:Date.now()
+    },
+    rating:{
+        type:Number,
+        ref:'course'
+
     }
 })
 
