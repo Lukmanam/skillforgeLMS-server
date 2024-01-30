@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import Student from "../models/studentModel.js";
 import Instructor from "../models/instructorModel.js"
 import Category from "../models/categoryModel.js"
-import Course from  "../models/courseModel.js"
+import Course from "../models/courseModel.js"
 dotenv.config();
 
 
@@ -14,7 +14,7 @@ export const adminLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
         if (adminemail === email && adminpassword === password) {
-            console.log("admin Login aakkaam");
+
             const token = Jwt.sign(
                 {
                     name: userName,
@@ -28,7 +28,7 @@ export const adminLogin = async (req, res) => {
                     expiresIn: "1h"
                 }
             );
-            console.log("yeaah tokeeeen", token);
+
             res
                 .status(200).json({ userName, token, message: `Welcome ${userName}` })
 
@@ -41,13 +41,13 @@ export const adminLogin = async (req, res) => {
         console.log(error);
         res.status(500).json({ message: "Internal Server Error" })
     }
-}    
+}
 
 
 export const studentsList = async (req, res) => {
     try {
         const students = await Student.find();
-        console.log(students);
+
         res.status(200).json({ students });
     } catch (error) {
         console.log(error);
@@ -71,7 +71,7 @@ export const studentBlock = async (req, res) => {
 export const instructorList = async (req, res) => {
     try {
         const instructors = await Instructor.find();
-        console.log(instructors);
+
         res.status(200).json({ instructors });
     } catch (error) {
         console.log(error);
@@ -90,53 +90,49 @@ export const instructorBlock = async (req, res) => {
 
     }
 };
-export const instructorCount = async (req, res) => {
+export const fetchCounts = async (req, res) => {
     try {
-        const count = await Instructor.find().countDocuments();
-        console.log("Instructor Count", count);
-        return count
+        const Instructorcount = await Instructor.find().countDocuments();
+        const studentsCount = await Student.find().countDocuments();
+        const courseCount=await Course.find().countDocuments();
+        const ApprovedcourseCount=await Course.find({isApproved:true}).countDocuments();
+        const ActiveInstructors=await Instructor.find({is_blocked:false}).countDocuments();
+        const ActiveStudents=await Student.find({isBlocked:false}).countDocuments();
+
+
+
+
+
+        res.status(200).json({Instructorcount,studentsCount,courseCount,ApprovedcourseCount,ActiveInstructors,ActiveStudents})
     } catch (error) {
         console.log(error);
-    }
-}
-
-export const studentsCount = async (req, res) => {
-    try {
-        const count = await Student.find().countDocuments()
-        console.log("Students Count", count);
-        return count
-    } catch (error) {
-        res.status(500).json({ message: "Internal Server Error" })
     }
 }
 export const addCategory = async (req, res) => {
     try {
 
-        const{ categoryName} = req.body;
-        console.log(categoryName);
+        const { categoryName } = req.body;
         const alreadyExist = await Category.findOne({ name: categoryName });
-       console.log(alreadyExist);
         if (alreadyExist) {
-            console.log("already exist");
-            res.status(400).json({message:"Category already exist"})
+            res.status(400).json({ message: "Category already exist" })
         }
         else {
-            console.log("trying to save");
+
             const category = new Category({
                 name: categoryName
             })
             const saveCategory = await category.save();
-            res.status(200).json({message:"Category Added"})
+            res.status(200).json({ message: "Category Added" })
         }
     } catch (error) {
-console.log(error);
+        console.log(error);
     }
 }
 
 export const categoryList = async (req, res) => {
     try {
         const category = await Category.find()
-        console.log(category);
+
         res
             .status(200).json({ category })
     } catch (error) {
@@ -145,66 +141,65 @@ export const categoryList = async (req, res) => {
     }
 }
 
-export const listunlist=async(req,res)=>{
+export const listunlist = async (req, res) => {
     try {
-        console.log(req.body);
-        const {categoryId}=req.body;
-        console.log(categoryId);
-        const status=await Category.findOne({_id:categoryId})
-        if(status.isBlocked===true)
-        {
-           const updated= await Category.findByIdAndUpdate({_id:categoryId},{$set:{isBlocked:false}})
-            res.status(200).json({message:"Listed Successfully",updated})
+
+        const { categoryId } = req.body;
+        const status = await Category.findOne({ _id: categoryId })
+        if (status.isBlocked === true) {
+            const updated = await Category.findByIdAndUpdate({ _id: categoryId }, { $set: { isBlocked: false } })
+            res.status(200).json({ message: "Listed Successfully", updated })
         }
-        else{
-           const updated= await Category.findByIdAndUpdate({_id:categoryId},{$set:{isBlocked:true}})
-            res.status(200).json({message:"Unlisted Successfully",updated})
+        else {
+            const updated = await Category.findByIdAndUpdate({ _id: categoryId }, { $set: { isBlocked: true } })
+            res.status(200).json({ message: "Unlisted Successfully", updated })
         }
-        
+
     } catch (error) {
         console.log(error);
-        res.status(500).json({message:"Internal Server Error"})
+        res.status(500).json({ message: "Internal Server Error" })
     }
 
 
 }
 
-export const coursesList=async(req,res)=>{
+export const coursesList = async (req, res) => {
     try {
-        const courses= await Course.find().populate('category');
-        console.log(courses);
-        res.status(200).json({courses})
-        
+        const courses = await Course.find().populate('category');
+        res.status(200).json({ courses })
+
     } catch (error) {
         console.log(error);
-        res.status(500).json({message:"Internal server Error"})
-        
+        res.status(500).json({ message: "Internal server Error" })
+
     }
 }
 
 
-export const courseApproval=async(req,res)=>{
+export const courseApproval = async (req, res) => {
     try {
-        
-        const {courseId}=req.body;
-        console.log(courseId);
-        const courseData=await Course.findOne({_id:courseId});
-        console.log(courseData);
-        if(courseData){
-        if(courseData.isApproved){
-            console.log("removing Approval");
-           const updated= await Course.findByIdAndUpdate({_id:courseId},{$set:{isApproved:false}})
-            console.log(updated,"this is updated update has been removed");
+
+        const { courseId } = req.body;
+        const courseData = await Course.findOne({ _id: courseId });
+        if (courseData) {
+            if (courseData.isApproved) {
+                const updated = await Course.findByIdAndUpdate({ _id: courseId }, { $set: { isApproved: false } })
+            }
+            else {
+                await Course.findByIdAndUpdate({ _id: courseId }, { $set: { isApproved: true } })
+            }
+            res.status(200).json({ message: "Successfully Changed Approval Status" })
         }
-        else
-        {
-            await Course.findByIdAndUpdate({_id:courseId},{$set:{isApproved:true}})
-        }
-        res.status(200).json({message:"Successfully Changed Approval Status"})
-    }
     } catch (error) {
-     res.status(500).jsn({message:"Internal server Error"}) 
+        res.status(500).jsn({ message: "Internal server Error" })
     }
+
+}
+
+export const fetchSalesGraph=async(req,res)=>{
+
+    
+
 
 }
 
