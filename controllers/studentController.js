@@ -11,6 +11,8 @@ import dotenv from 'dotenv';
 import { sendResetpassword } from '../utilities/otpControl.js'
 import { response } from 'express';
 import EnrolledCourse from '../models/enrolledCourseModel.js';
+import chatModel from '../models/chatModel.js';
+import notificationModel from '../models/notificationModel.js';
 
 dotenv.config()
 
@@ -308,7 +310,7 @@ export const checkfavouriteStatus = async (req, res) => {
         } else {
             res.status(200).json({ message: "Checked for favourite or not", favorite: false });
         }
-         }    
+    }
     catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal Server Error" });
@@ -371,6 +373,50 @@ export const enrollToCourse = async (req, res) => {
         console.log(error);
     }
 
+}
+
+export const createChat = async (req, res) => {
+    try {
+
+        const { studentId, instructorId } = req.body
+
+        const chatExist = await chatModel.findOne({
+            members: { $all: [studentId, instructorId] }
+        })
+        if (!chatExist) {
+            const newChat = new chatModel({
+                members: [studentId.toString(), instructorId.toString()]
+            })
+            await newChat.save()
+            res.status(200).json({ message: 'Your are connected' })
+
+        }
+
+        const notification = new notificationModel({
+            text: 'Your chat created successfully',
+            userId: studentId,
+        })
+
+        await notification.save()
+
+        res.status(200).json({ message: 'You are connected' })
+
+    } catch (error) {
+        console.log(error.message)
+    }
+}
+
+export const getInstructor = async (req, res) => {
+    try {
+        const { courseId } = req.params;
+        console.log(courseId, "this is course id of course enrolled");
+        const instructor = await Course.findOne({ _id: courseId })
+        console.log(instructor, "this is instructor of Enrolled Course");
+        res?.status(200).json({ instructor })
+
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 export const checkEnrollment = async (req, res) => {

@@ -1,19 +1,19 @@
 import mongoose from "mongoose";
 
-const categorySchema=mongoose.Schema({
-    name:{
-        type:String,
-        required:true
+const categorySchema = mongoose.Schema({
+    name: {
+        type: String,
+        required: true
     },
-    isBlocked:{
-        type:Boolean,
-        default:false
+    isBlocked: {
+        type: Boolean,
+        default: false
     },
-    createdAt:{
-        type:Date,
-        default:Date.now(),
+    createdAt: {
+        type: Date,
+        default: Date.now(),
 
     }
 })
 
-export default  mongoose.model('category',categorySchema)
+export default mongoose.model('category', categorySchema)

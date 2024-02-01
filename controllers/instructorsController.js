@@ -303,10 +303,22 @@ export const EditinstructorProfile = async (req, res) => {
     console.log(instructorId, name, phone);
 
     await Instructor.updateOne({ _id: instructorId }, { $set: { name: name, phone: phone } })
-    const updatedInstructor = await Instructor.findById({_id:instructorId})
+    const updatedInstructor = await Instructor.findById({ _id: instructorId })
     res.status(200).json({ message: "success", updatedInstructor, })
+
+
 }
 
+export const instructorDatainChat = async (req, res) => {
+    try {
+        const { instructorId } = req.params;
+        const instructor = await Instructor.findOne({ _id: instructorId });
+        console.log(instructor, "Instructor in chat");
+        res.status(200).json({ instructor })
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 
 

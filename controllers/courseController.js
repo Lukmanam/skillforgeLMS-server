@@ -217,12 +217,12 @@ export const saveProgress = async (req, res) => {
 
 }
 
-export const alreadyCompletedModules=async(req,res)=>{
+export const alreadyCompletedModules = async (req, res) => {
     const courseId = req.query.courseId;
     const studentId = req.query.studentId;
-    const modulesCompleted=await EnrolledCourse.findOne({courseId:courseId,studentId:studentId});
+    const modulesCompleted = await EnrolledCourse.findOne({ courseId: courseId, studentId: studentId });
     console.log(modulesCompleted);
-    res.status(200).json({modulesCompleted})
+    res.status(200).json({ modulesCompleted })
 
 }
 

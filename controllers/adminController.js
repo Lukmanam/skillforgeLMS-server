@@ -94,16 +94,16 @@ export const fetchCounts = async (req, res) => {
     try {
         const Instructorcount = await Instructor.find().countDocuments();
         const studentsCount = await Student.find().countDocuments();
-        const courseCount=await Course.find().countDocuments();
-        const ApprovedcourseCount=await Course.find({isApproved:true}).countDocuments();
-        const ActiveInstructors=await Instructor.find({is_blocked:false}).countDocuments();
-        const ActiveStudents=await Student.find({isBlocked:false}).countDocuments();
+        const courseCount = await Course.find().countDocuments();
+        const ApprovedcourseCount = await Course.find({ isApproved: true }).countDocuments();
+        const ActiveInstructors = await Instructor.find({ is_blocked: false }).countDocuments();
+        const ActiveStudents = await Student.find({ isBlocked: false }).countDocuments();
 
 
 
 
 
-        res.status(200).json({Instructorcount,studentsCount,courseCount,ApprovedcourseCount,ActiveInstructors,ActiveStudents})
+        res.status(200).json({ Instructorcount, studentsCount, courseCount, ApprovedcourseCount, ActiveInstructors, ActiveStudents })
     } catch (error) {
         console.log(error);
     }
@@ -196,9 +196,9 @@ export const courseApproval = async (req, res) => {
 
 }
 
-export const fetchSalesGraph=async(req,res)=>{
+export const fetchSalesGraph = async (req, res) => {
 
-    
+
 
 
 }
