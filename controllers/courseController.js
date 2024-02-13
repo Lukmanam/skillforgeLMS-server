@@ -191,8 +191,8 @@ export const paymentCheckout = async (req, res) => {
         payment_method_types: ["card"],
         line_items: lineItems,
         mode: "payment",
-        success_url: `http://localhost:5173/enrollSuccess/${course._id}`,
-        cancel_url: `http://localhost:5173/CourseDetails/${course._id}`,
+        success_url: `https://skillforge-lms-client.vercel.app/enrollSuccess/${course._id}`,
+        cancel_url: `https://skillforge-lms-client.vercel.app/CourseDetails/${course._id}`,
         // customer_email: "test@example.com", // Use a dummy email for testing
         // billing_address_collection: "auto"
 
