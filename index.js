@@ -21,7 +21,7 @@ dbconnect();
 // app.use(express.json())
 const corsoptions = {
   // origin: 'http://localhost:5173',
-  origin: 'https://skillforge-lms-client.vercel.app',
+  // origin: 'https://skillforge-lms-client.vercel.app',
   methods: ['GET', 'POST', 'PUT', 'PATCH'],
   credentials: true,
 }
