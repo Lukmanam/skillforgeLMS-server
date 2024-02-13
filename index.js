@@ -20,7 +20,8 @@ dbconnect();
 // app.use(express.urlencoded({extended:true}))
 // app.use(express.json())
 const corsoptions = {
-  origin: 'http://localhost:5173',
+  // origin: 'http://localhost:5173',
+  origin: 'https://skillforge-lms-client.vercel.app',
   methods: ['GET', 'POST', 'PUT', 'PATCH'],
   credentials: true,
 }

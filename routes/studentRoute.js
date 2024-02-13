@@ -19,6 +19,7 @@ import { checkratingStatus } from '../controllers/studentController.js';
 import { fetchCourseRating } from '../controllers/studentController.js';
 import { createChat } from '../controllers/studentController.js';
 import { getInstructor } from '../controllers/studentController.js';
+import { fetchcoursereviews } from '../controllers/studentController.js';
 import express from 'express'
 
 const studentRoute = express();
@@ -49,6 +50,7 @@ studentRoute.get('/alreadyCompletedModules', alreadyCompletedModules)
 studentRoute.post('/rateCourse', rateCourse)
 studentRoute.get('/checkratingStatus', checkratingStatus)
 studentRoute.get('/fetchCourseRating/:courseId', fetchCourseRating)
+studentRoute.get('/fetchcoursereviews/:courseId', fetchcoursereviews)
 studentRoute.post('/createChat', createChat)
 
 

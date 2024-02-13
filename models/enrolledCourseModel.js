@@ -26,6 +26,10 @@ const enrolledSchema = new mongoose.Schema({
         ref: 'course'
 
     },
+    review:{
+        type:String
+
+    },
     price: {
         type: Number
     }

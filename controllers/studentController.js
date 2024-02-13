@@ -482,12 +482,12 @@ export const learnCourse = async (req, res) => {
 
 
 export const rateCourse = async (req, res) => {
-    const { rated, courseId, studentId } = req.body
+    const { rated,review, courseId, studentId } = req.body
     console.log(req.body, "body for rating");
     console.log(rated, "this is ratin");
     const notAlreadyrated = await EnrolledCourse.findOne({ courseId: courseId, studentId: studentId, rating: { $exists: false } });
     if (notAlreadyrated) {
-        const rate = await EnrolledCourse.findOneAndUpdate({ courseId: courseId, studentId: studentId }, { $set: { rating: rated } });
+        const rate = await EnrolledCourse.findOneAndUpdate({ courseId: courseId, studentId: studentId }, { $set: { rating: rated,review:review} });
         console.log(rate);
         res.status(200).json({ rated })
         console.log("Not eated Before");
@@ -519,7 +519,7 @@ export const checkratingStatus = async (req, res) => {
 export const fetchCourseRating = async (req, res) => {
 
     const { courseId } = req.params;
-    console.log(courseId, "this is the course for finding ");
+    
 
     const documents = await EnrolledCourse.find({ courseId: courseId, rating: { $exists: true } });
     const ratingCount = await EnrolledCourse.find({ courseId: courseId, rating: { $exists: true } }).countDocuments()
@@ -532,6 +532,24 @@ export const fetchCourseRating = async (req, res) => {
     res.status(200).json({ averageRating, ratingCount })
 
 }
+
+
+
+export const fetchcoursereviews = async (req, res) => {
+
+    const { courseId } = req.params;
+    console.log(courseId, "this is the course for finding reviews ");
+
+    const documents = await EnrolledCourse.find({ courseId: courseId, review: { $exists: true } }).populate("studentId");
+    console.log(documents,"reviewed Students");
+    const ratingCount = await EnrolledCourse.find({ courseId: courseId, rating: { $exists: true } }).countDocuments()
+    console.log("count", );
+ 
+
+    res.status(200).json({ documents, ratingCount })
+
+}
+
 
 
 
