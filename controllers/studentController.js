@@ -533,6 +533,31 @@ export const fetchCourseRating = async (req, res) => {
 
 }
 
+export const searchCourse=async(req,res)=>{
+    try {
+        
+        const {searchQuery}=req.params;
+        const regex=new RegExp(searchQuery,"i");
+        const search=await Course.find({courseName:{ $regex: regex }
+        }).populate('instructorId')
+        console.log(search);
+        res.status(200).json({search})
+    } catch (error) {
+        console.log(error);
+    }
+
+    
+}
+
+export const categoryFilter=async(req,res)=>{
+    const {filterCategory}=req.params;
+    console.log(filterCategory,"filtering on this category");
+    const filtered=await Course.find({category:filterCategory}).populate('instructorId')
+    console.log(filtered,"these are courses filtered on ",filterCategory);
+    res.status(200).json({filtered})
+
+}
+
 
 
 export const fetchcoursereviews = async (req, res) => {
