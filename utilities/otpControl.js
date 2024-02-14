@@ -95,7 +95,7 @@ export const sendResetpassword=async(name,email,id)=>{
           </a>
         </div>
         <p style="font-size: 1.1em">Hi,${name}</p>
-        <p><b>Use reset Link to change Your SkillForGe Password.<a href="http://localhost:5173/changepassword?id=${id}">Click here</a></b></p><br/>
+        <p><b>Use reset Link to change Your SkillForGe Password.<a href="https://skillforge-lms-client.vercel.app/changepassword?id=${id}">Click here</a></b></p><br/>
 
         <p style="font-size: 0.9em;">Regards,<br />SkillForGe</p>
         <hr style="border: none; border-top: 1px solid #eee" />
@@ -152,7 +152,7 @@ export const sendResetpasswordIns=async(name,email,id)=>{
           </a>
         </div>
         <p style="font-size: 1.1em">Hi,${name}</p>
-        <p><b>Use reset Link to change Your SkillForGe Password.<a href="http://localhost:5173/instructor/inschangePassword?id=${id}">Click here</a></b></p><br/>
+        <p><b>Use reset Link to change Your SkillForGe Password.<a href="https://skillforge-lms-client.vercel.app/instructor/inschangePassword?id=${id}">Click here</a></b></p><br/>
         
         
 
