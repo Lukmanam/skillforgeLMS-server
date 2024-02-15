@@ -9,7 +9,7 @@ import { addCategory } from '../controllers/adminController.js';
 import { listunlist } from '../controllers/adminController.js';
 import { coursesList } from '../controllers/adminController.js';
 import {courseApproval} from  '../controllers/adminController.js';
-
+import { fetchEnrollments } from '../controllers/adminController.js';
 
 
 const adminRoute=express.Router()
@@ -26,8 +26,7 @@ adminRoute.get("/categories",categoryList)
 adminRoute.post('/listUnlist',listunlist)
 adminRoute.get('/courses',coursesList)
 adminRoute.post('/courseApproval',courseApproval)
-// adminRoute.get('/fetchSales',fetchSalesGraph)
-
+adminRoute.get('/fetchEnrollments',fetchEnrollments)
 
 
 

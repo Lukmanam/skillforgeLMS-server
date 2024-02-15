@@ -4,6 +4,7 @@ import Student from "../models/studentModel.js";
 import Instructor from "../models/instructorModel.js"
 import Category from "../models/categoryModel.js"
 import Course from "../models/courseModel.js"
+import EnrolledCourses from "../models/enrolledCourseModel.js";
 dotenv.config();
 
 
@@ -196,9 +197,75 @@ export const courseApproval = async (req, res) => {
 
 }
 
-export const fetchSalesGraph = async (req, res) => {
 
+export const fetchEnrollments = async (req, res) => {
 
+    try {
+        const today = new Date();
+        console.log(today,"this is today");
+        const fiveDaysAgo = new Date(today);
+        fiveDaysAgo.setDate(today.getDate() - 4);
+
+        const enrollments = await EnrolledCourses.aggregate([
+            {
+                $match: {
+                    enrolledAt: { $gte: fiveDaysAgo, $lte: today },
+                },
+            },
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$date" },
+                        month: { $month: "$date" },
+                        day: { $dayOfMonth: "$date" },
+                    },
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 },
+            },
+        ]);
+        console.log(enrollments,"this are enrollments");
+        const dailyenrollmentCounts = enrollments.map((entry) => entry.count);
+        console.log(dailyenrollmentCounts, "enrollment Count")
+        const studentCount = await Student.find().countDocuments();
+        const instructorCount = await Instructor.find().countDocuments();
+        const courseCount = await Course.find().countDocuments();
+
+        const enrollmentss = await EnrolledCourses.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$date" },
+                        month: { $month: "$date" },
+                        day: { $dayOfMonth: "$date" },
+                    },
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalEnrollments: { $sum: "$count" },
+                    totalDays: { $sum: 1 },
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    averageEnrollmentsPerDay: { $divide: ["$totalEnrollments", "$totalDays"] },
+                },
+            },
+        ]);
+        const averageEnrollmentsPerDay = enrollmentss[0].averageEnrollmentsPerDay.toFixed(1);
+        console.log(averageEnrollmentsPerDay,"avaerage");
+        res
+            .status(200)
+            .json({ averageEnrollmentsPerDay, studentCount, instructorCount, courseCount, dailyenrollmentCounts });
+    } catch (error) {
+        console.log(error.message);
+    }
 
 
 }
