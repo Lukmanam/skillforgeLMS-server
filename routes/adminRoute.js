@@ -23,7 +23,7 @@ adminRoute.patch("/instructorBlock",instructorBlock)
 adminRoute.get("/fetchCounts",fetchCounts)
 
 adminRoute.post('/addCategory',addCategory)
-adminRoute.get("/categories",adminAuthMiddleware, categoryList)
+adminRoute.get("/categories", categoryList)
 adminRoute.post('/listUnlist',listunlist)
 adminRoute.get('/courses',coursesList)
 adminRoute.post('/courseApproval',courseApproval)
