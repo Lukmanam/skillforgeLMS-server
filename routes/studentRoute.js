@@ -22,6 +22,7 @@ import { getInstructor } from '../controllers/studentController.js';
 import { fetchcoursereviews } from '../controllers/studentController.js';
 import { searchCourse } from '../controllers/studentController.js';
 import { categoryFilter } from '../controllers/studentController.js';
+import studentAuthMidleware from '../middlewares/studentAuthMidleware.js';
 import express from 'express'
 
 const studentRoute = express();
@@ -38,15 +39,15 @@ studentRoute.get('/allCourselist', allCourseslist)
 studentRoute.get('/allCategoriesList', allCategoryCoursePage)
 studentRoute.post('/addtoFavourite', addtoFavCourses)
 studentRoute.post('/checkFavouriteStatus', checkfavouriteStatus)
-studentRoute.get('/fetchFavouriteCourses/:studentId', fetchFavouriteCourses)
-studentRoute.get('/fetchCourseData/:courseId', fetchCourseData)
+studentRoute.get('/fetchFavouriteCourses/:studentId',studentAuthMidleware, fetchFavouriteCourses)
+studentRoute.get('/fetchCourseData/:courseId',studentAuthMidleware, fetchCourseData)
 studentRoute.post('/enrolltoCourse', enrollToCourse);
 studentRoute.post('/checkEnrollment', checkEnrollment)
-studentRoute.get('/EnrolledCourse/:studentId', fetchEnrolledCourse)
+studentRoute.get('/EnrolledCourse/:studentId',studentAuthMidleware, fetchEnrolledCourse)
 studentRoute.post('/editStudentProfile', editStudentProfile)
 studentRoute.post('/paymentCheckoutSesion', paymentCheckout);
 studentRoute.get('/getinstructor/:courseId', getInstructor)
-studentRoute.get('/learnCourse/:courseId', learnCourse);
+studentRoute.get('/learnCourse/:courseId',studentAuthMidleware, learnCourse);
 studentRoute.post('/saveCourseProgress', saveProgress)
 studentRoute.get('/alreadyCompletedModules', alreadyCompletedModules)
 studentRoute.post('/rateCourse', rateCourse)
