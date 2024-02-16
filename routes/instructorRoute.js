@@ -18,7 +18,7 @@ import { getCourseDetails } from '../controllers/courseController.js'
 import { editCourse } from '../controllers/courseController.js';
 import { EditinstructorProfile } from '../controllers/instructorsController.js';
 import { instructorDatainChat } from '../controllers/instructorsController.js';
-
+import instructorAuthMiddleware from '../middlewares/instructorAuthMiddleware.js';
 const instructorRoute = express.Router()
 instructorRoute.post('/signup', registerInstructor)
 instructorRoute.post('/resendotp', resendInstructorOtp)
@@ -28,17 +28,17 @@ instructorRoute.post('/instructorForgotPassword', instructorforgotpassword)
 instructorRoute.post('/instructorChangePassword', changePassword)
 instructorRoute.post('/googleSignins', googleSignins)
 instructorRoute.post('/addCourse', addNewCourse)
-instructorRoute.get('/myCourses/:instructorId', myCourses)
+instructorRoute.get('/myCourses/:instructorId',instructorAuthMiddleware, myCourses)
 instructorRoute.get('/fetchCategories', fetchCategories);
-instructorRoute.get('/fetchCourseData/:courseId', fetchCouseData)
+instructorRoute.get('/fetchCourseData/:courseId',instructorAuthMiddleware, fetchCouseData)
 instructorRoute.post('/addModule', addModule)
 instructorRoute.post('/deleteModule', deleteModule)
 instructorRoute.post('/changeListStatus', changeListStatus)
 instructorRoute.get('/checkListStatus/:courseId', checkListStatus)
-instructorRoute.get('/getCourseDetails/:courseId', getCourseDetails)
+instructorRoute.get('/getCourseDetails/:courseId',instructorAuthMiddleware, getCourseDetails)
 instructorRoute.patch('/editCourse', editCourse);
 instructorRoute.post('/profileData', EditinstructorProfile)
-instructorRoute.get('/instructorinchat/:instructorId', instructorDatainChat)
+instructorRoute.get('/instructorinchat/:instructorId',instructorAuthMiddleware, instructorDatainChat)
 
 
 
