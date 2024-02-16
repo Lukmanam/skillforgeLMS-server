@@ -10,6 +10,7 @@ import { listunlist } from '../controllers/adminController.js';
 import { coursesList } from '../controllers/adminController.js';
 import {courseApproval} from  '../controllers/adminController.js';
 import { fetchEnrollments } from '../controllers/adminController.js';
+import adminAuthMiddleware from '../middlewares/adminAuthMiddleware.js';
 
 
 const adminRoute=express.Router()
@@ -22,7 +23,7 @@ adminRoute.patch("/instructorBlock",instructorBlock)
 adminRoute.get("/fetchCounts",fetchCounts)
 
 adminRoute.post('/addCategory',addCategory)
-adminRoute.get("/categories",categoryList)
+adminRoute.get("/categories",adminAuthMiddleware, categoryList)
 adminRoute.post('/listUnlist',listunlist)
 adminRoute.get('/courses',coursesList)
 adminRoute.post('/courseApproval',courseApproval)
