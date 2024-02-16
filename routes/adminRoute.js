@@ -16,18 +16,18 @@ import adminAuthMiddleware from '../middlewares/adminAuthMiddleware.js';
 const adminRoute=express.Router()
 
 adminRoute.post("/login",adminLogin);
-adminRoute.get("/students",studentsList)
+adminRoute.get("/students",adminAuthMiddleware,studentsList)
 adminRoute.patch("/studentBlock",studentBlock)
-adminRoute.get("/instructors",instructorList)
+adminRoute.get("/instructors",adminAuthMiddleware,instructorList)
 adminRoute.patch("/instructorBlock",instructorBlock)
-adminRoute.get("/fetchCounts",fetchCounts)
+adminRoute.get("/fetchCounts",adminAuthMiddleware,fetchCounts)
 
 adminRoute.post('/addCategory',addCategory)
-adminRoute.get("/categories", categoryList)
+adminRoute.get("/categories",adminAuthMiddleware, categoryList)
 adminRoute.post('/listUnlist',listunlist)
-adminRoute.get('/courses',coursesList)
+adminRoute.get('/courses',adminAuthMiddleware,coursesList)
 adminRoute.post('/courseApproval',courseApproval)
-adminRoute.get('/fetchEnrollments',fetchEnrollments)
+adminRoute.get('/fetchEnrollments',adminAuthMiddleware,fetchEnrollments)
 
 
 
