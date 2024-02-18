@@ -490,7 +490,7 @@ export const rateCourse = async (req, res) => {
         const rate = await EnrolledCourse.findOneAndUpdate({ courseId: courseId, studentId: studentId }, { $set: { rating: rated,review:review} });
         console.log(rate);
         res.status(200).json({ rated })
-        console.log("Not eated Before");
+      
 
     }
     else {
@@ -519,6 +519,7 @@ export const checkratingStatus = async (req, res) => {
 export const fetchCourseRating = async (req, res) => {
 
     const { courseId } = req.params;
+    
     
 
     const documents = await EnrolledCourse.find({ courseId: courseId, rating: { $exists: true } });
@@ -565,13 +566,13 @@ export const fetchcoursereviews = async (req, res) => {
     const { courseId } = req.params;
     console.log(courseId, "this is the course for finding reviews ");
 
-    const documents = await EnrolledCourse.find({ courseId: courseId, review: { $exists: true } }).populate("studentId");
-    console.log(documents,"reviewed Students");
+    const ratenReviews = await EnrolledCourse.find({ courseId: courseId, review: {$exists:true}  }).populate("studentId");
+    console.log(ratenReviews,"reviewed Students");
     const ratingCount = await EnrolledCourse.find({ courseId: courseId, rating: { $exists: true } }).countDocuments()
     console.log("count", );
  
 
-    res.status(200).json({ documents, ratingCount })
+    res.status(200).json({ ratenReviews, ratingCount })
 
 }
 
