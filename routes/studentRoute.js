@@ -25,6 +25,8 @@ import { categoryFilter } from '../controllers/studentController.js';
 import studentAuthMidleware from '../middlewares/studentAuthMidleware.js';
 import express from 'express'
 
+
+//Studen Route
 const studentRoute = express();
 studentRoute.post('/signup', studentSignup);
 studentRoute.post('/otp', emailOtpVerification);
