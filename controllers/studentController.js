@@ -569,12 +569,14 @@ export const fetchcoursereviews = async (req, res) => {
     const ratenReviews = await EnrolledCourse.find({ courseId: courseId, review: {$exists:true}  }).populate("studentId");
     console.log(ratenReviews,"reviewed Students");
     const ratingCount = await EnrolledCourse.find({ courseId: courseId, rating: { $exists: true } }).countDocuments()
-    console.log("count", );
+    console.log("count",ratingCount );
  
 
     res.status(200).json({ ratenReviews, ratingCount })
 
 }
+
+
 
 
 
