@@ -4,7 +4,7 @@ const studentAuthMidleware = (req,res,next) => {
  try {
     
     const token=req.header('autherization');
-    console.log(token,"in student auth middleware");
+    console.log(token,"in student auth middlewaree");
     if(!token){
       console.log("token is not available");
         return res.status(401).json({ message: 'Unauthorized: Missing token' });
