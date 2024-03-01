@@ -34,7 +34,6 @@ export const studentChats = async (req, res) => {
 
         const { id } = req.params
         const userId = id
-        console.log(userId, "in Student Chat");
         const chats = await Chat.aggregate([
             {
                 $match: { members: userId },
