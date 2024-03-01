@@ -202,7 +202,7 @@ export const fetchEnrollments = async (req, res) => {
 
     try {
         const today = new Date();
-        console.log(today,"this is today");
+        
         const fiveDaysAgo = new Date(today);
         fiveDaysAgo.setDate(today.getDate() - 4);
 
@@ -226,9 +226,7 @@ export const fetchEnrollments = async (req, res) => {
                 $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 },
             },
         ]);
-        console.log(enrollments,"this are enrollments");
         const dailyenrollmentCounts = enrollments.map((entry) => entry.count);
-        console.log(dailyenrollmentCounts, "enrollment Count")
         const studentCount = await Student.find().countDocuments();
         const instructorCount = await Instructor.find().countDocuments();
         const courseCount = await Course.find().countDocuments();
@@ -259,7 +257,6 @@ export const fetchEnrollments = async (req, res) => {
             },
         ]);
         const averageEnrollmentsPerDay = enrollmentss[0].averageEnrollmentsPerDay.toFixed(1);
-        console.log(averageEnrollmentsPerDay,"avaerage");
         res
             .status(200)
             .json({ averageEnrollmentsPerDay, studentCount, instructorCount, courseCount, dailyenrollmentCounts });
