@@ -11,12 +11,7 @@ import stripe from "stripe";
 
 export const addNewCourse = async (req, res) => {
     try {
-        console.log(req.body);
         const { courseName, courseDescription, category, price, thumbnailImage, instructor } = req.body;
-        console.log(category, "this is category Selected");
-        console.log(courseDescription, "this is deiscregad Selected");
-        console.log(price, "this is price Selected");
-        console.log(category, "this is category Selected");
         const instructorId = instructor._id
         const courseThumbnail = await cloudinary.uploader.upload(thumbnailImage, {
 
@@ -24,7 +19,6 @@ export const addNewCourse = async (req, res) => {
         });
 
         let thumbnailImages = courseThumbnail.secure_url
-        console.log(thumbnailImages);
         const saving = await Course.create({
             courseName: courseName,
             instructorId: instructorId,
@@ -34,7 +28,6 @@ export const addNewCourse = async (req, res) => {
             thumbnail: thumbnailImages
 
         })
-        console.log(saving);
 
         res.
             status(200).json({ message: "Course Added Successfully" });
@@ -47,7 +40,6 @@ export const addNewCourse = async (req, res) => {
 export const fetchCategories = async (req, res) => {
     try {
         const categories = await Category.find({ isBlocked: false })
-        console.log(categories);
         res.status(200).json({ message: "Category Fetched Successfully", categories })
     } catch (error) {
         console.log(error);
@@ -58,10 +50,8 @@ export const fetchCategories = async (req, res) => {
 
 export const addModule = async (req, res) => {
     try {
-        console.log(req.body, "this is course in backend");
 
         const { module_title, module_order, video_url, course } = req.body.formData;
-        console.log(course, "course");
 
         const moduleVideo = await cloudinary.uploader
             .upload(video_url,
@@ -79,7 +69,6 @@ export const addModule = async (req, res) => {
                 console.error("error in Uploading video", error)
             })
 
-        console.log(moduleVideo);
         const video = moduleVideo.secure_url
 
         const saved = await Modules.create({
@@ -89,7 +78,7 @@ export const addModule = async (req, res) => {
             course: course
 
         });
-        console.log(saved._id, "this is module Id");
+
         const module = saved._id
 
         await Course.findByIdAndUpdate({ _id: course }, { $push: { modules: { module: module } } })
@@ -106,14 +95,13 @@ export const addModule = async (req, res) => {
 
 export const deleteModule = async (req, res) => {
     try {
-        console.log(req.body, "in deleteModule Function");
         const { moduleId, courseId } = req.body
-        console.log(moduleId, "this is Module id");
-        console.log(courseId, "this is course id");
+
+
         const deleted = await Course.findByIdAndUpdate({ _id: courseId }, { $pull: { modules: { _id: moduleId } } },
             { new: true }
         );
-        console.log(deleted, "deleted");
+
         res.status(200).json({ Message: "Module deleted Successfully" })
     }
 
@@ -126,10 +114,9 @@ export const deleteModule = async (req, res) => {
 
 export const getCourseDetails = async (req, res) => {
     const { courseId } = req.params;
-    console.log(courseId);
+
 
     const courseDetails = await Course.findOne({ _id: courseId });
-    console.log(courseDetails, "this is course Details  for edit Course");
     res.status(200).json({ courseDetails })
 }
 
@@ -144,7 +131,6 @@ export const editCourse = async (req, res) => {
         });
 
         let thumbnailImages = courseThumbnail.secure_url
-        console.log(thumbnailImages);
         const saving = await Course.findByIdAndUpdate({ _id: courseId }, {
             $set: {
                 courseName: courseName,
@@ -157,7 +143,6 @@ export const editCourse = async (req, res) => {
 
 
         })
-        console.log(saving);
 
         res.
             status(200).json({ message: "Edit Has been Done Successfully" });
@@ -170,7 +155,7 @@ export const editCourse = async (req, res) => {
 
 export const paymentCheckout = async (req, res) => {
     const stripeInstance = stripe('sk_test_51OFr1pSB3NLla9eM1vE5JuNyD4fIMDGfyLEn6WZoaJNUzhZhKMzONjIuZWEQj8DZyprUuykNLJIRxWLXiadQgYqe00HEwuW6rM')
-    console.log(req.body, "this is whole Body");
+
     const course = req.body.courseData
 
     const lineItems = [
@@ -198,10 +183,8 @@ export const paymentCheckout = async (req, res) => {
 
     });
 
-    console.log(session, "this is sessioon");
-    res.json({ id: session.id })
 
-    console.log(course, "this is course Data which is Enrollinggggggggggggggggggggggg");
+    res.json({ id: session.id })
 
 }
 
@@ -209,11 +192,9 @@ export const paymentCheckout = async (req, res) => {
 
 
 export const saveProgress = async (req, res) => {
-    console.log(req.body, "saving Progreess of learning");
+
     const { courseId, studentId, moduleId } = req.body;
-    // const alreadyexist=await EnrolledCourse.findOne({studentId:studentId,courseId:courseId})
     const progress = await EnrolledCourse.findOneAndUpdate({ studentId: studentId, courseId: courseId }, { $push: { Progress: moduleId } })
-    console.log(progress);
 
 }
 
@@ -221,7 +202,6 @@ export const alreadyCompletedModules = async (req, res) => {
     const courseId = req.query.courseId;
     const studentId = req.query.studentId;
     const modulesCompleted = await EnrolledCourse.findOne({ courseId: courseId, studentId: studentId });
-    console.log(modulesCompleted);
     res.status(200).json({ modulesCompleted })
 
 }
