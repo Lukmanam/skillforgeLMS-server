@@ -135,7 +135,6 @@ export const studentLogin = async (req, res) => {
                         { name: studentData.name, email: studentData.email, id: studentData._id, role: "student" },
                         process.env.STUDENT_SECRET,
                         { expiresIn: "1h", });
-
                     res.status(200).json({ studentData, token, message: `welcome ${studentData.name}` })
                 }
                 else {
@@ -143,7 +142,6 @@ export const studentLogin = async (req, res) => {
                 }
             }
             else {
-                console.log("creadentials not valid");
                 res.status(401).json({ message: "Authentication Failed, Invalid Credential" })
             }
         }
@@ -160,7 +158,6 @@ export const studentLogin = async (req, res) => {
 export const forgotpassword = async (req, res) => {
     const { email } = req.body;
     const studentData = await Student.findOne({ email: email })
-    console.log(studentData);
     if (studentData) {
         await sendResetpassword(studentData.name, studentData.email, studentData._id)
 
@@ -176,11 +173,9 @@ export const forgotpassword = async (req, res) => {
 
 export const changePassword = async (req, res) => {
     try {
-        console.log(req.body);
         const { id, newPassword } = req.body
         const hashedPassword = await securePassword(newPassword)
         const studentData = await Student.findByIdAndUpdate({ _id: id }, { $set: { password: hashedPassword } });
-        console.log("password has been changed");
         res.status(201).json({ message: "Password Changed Successfully" })
     } catch (error) {
         res.status(500).json({ message: "Internal server error" })
@@ -191,14 +186,12 @@ export const changePassword = async (req, res) => {
 
 export const googleSignin = async (req, res) => {
     try {
-        console.log("In Google signin");
         const userData = req.body.user
         const { email, displayName } = userData;
         const studentData = await Student.findOne({ email: email })
         if (studentData) {
             const token = jwt.sign({ id: studentData._id }, process.env.STUDENT_SECRET);
             const { password: pass, ...rest } = studentData._doc;
-            console.log("Student Can Login");
 
             res.status(200)
                 .json({ studentData, token, message: `Welcome Back ${studentData.name}` })
@@ -213,11 +206,8 @@ export const googleSignin = async (req, res) => {
             })
             const newStudent = await student.save();
             const studentData = await Student.findOne({ email: email })
-            console.log(studentData.email, "this is email");
             const changed = await Student.findOneAndUpdate({ email: studentData.email }, { $set: { isVerified: true } })
-            console.log(changed, "NEW STUDENT DATA");
             const token = jwt.sign({ id: student._id }, process.env.STUDENT_SECRET);
-            console.log("New User Registered with Google Account");
             const { password: pass, ...rest } = student._doc;
             res.status(200).json({ studentData, token, message: `Welcome  ${newStudent.name}` })
 
@@ -239,20 +229,17 @@ export const allCategories = async (req, res) => {
 
 export const allCategoryCoursePage = async (req, res) => {
     const categories = await Category.find({ isBlocked: false });
-    console.log(categories);
     res.status(200).json({ message: "Categories for Students", categories })
 }
 
 export const allCourses = async (req, res) => {
     const courses = await Course.find({ isApproved: true, is_Listed: true }).populate('instructorId')
     res.status(200).json({ message: "All courses fetched", courses })
-    console.log(courses, "these are Courses");
 }
 
 export const allCourseslist = async (req, res) => {
     const courses = await Course.find({ isApproved: true, is_Listed: true }).populate('instructorId')
     res.status(200).json({ message: "All courses page courses", courses })
-    console.log(courses, "all courses list page");
 
 }
 
@@ -299,9 +286,7 @@ export const checkfavouriteStatus = async (req, res) => {
 export const fetchFavouriteCourses = async (req, res) => {
     try {
         const { studentId } = req.params;
-        console.log(studentId);
         const favCourses = await SavedCourse.find({ studentId: studentId }).populate('courseId');
-        console.log(favCourses);
         res.status(200).json({ favCourses })
 
     } catch (error) {
@@ -314,10 +299,7 @@ export const fetchFavouriteCourses = async (req, res) => {
 export const fetchCourseData = async (req, res) => {
     try {
         const { courseId } = req.params;
-        console.log(courseId, "this courseId for courseDetails");
         const courseData = await Course.find({ _id: courseId }).populate('category').populate('instructorId').populate('modules.module')
-
-        console.log(courseData);
         res.status(200).json({ courseData })
 
     } catch (error) {
@@ -328,10 +310,9 @@ export const fetchCourseData = async (req, res) => {
 export const enrollToCourse = async (req, res) => {
     try {
         const { courseId, studentId } = req.body
-        console.log(courseId, studentId);
+
         const alreadyEnrolled = await EnrolledCourse.findOne({ courseId: courseId, studentId: studentId });
         if (alreadyEnrolled) {
-            console.log("Already enrolled");
             res.status(400).json({ message: "Already Enrolled" })
         }
         else {
@@ -341,11 +322,7 @@ export const enrollToCourse = async (req, res) => {
 
             })
             const enrolled = await Student.findByIdAndUpdate({ _id: studentId }, { $push: { enrolledCourse: { course: courseId } } });
-            console.log("enrolled Successfully");
             res.status(200).json({ message: "Enrolled Successfully", enrolled })
-            console.log("enrolled Successfully");
-
-
         }
     } catch (error) {
         console.log(error);
@@ -387,9 +364,7 @@ export const createChat = async (req, res) => {
 export const getInstructor = async (req, res) => {
     try {
         const { courseId } = req.params;
-        console.log(courseId, "this is course id of course enrolled");
         const instructor = await Course.findOne({ _id: courseId })
-        console.log(instructor, "this is instructor of Enrolled Course");
         res?.status(200).json({ instructor })
 
     } catch (error) {
@@ -428,14 +403,10 @@ export const fetchEnrolledCourse = async (req, res) => {
 
 export const editStudentProfile = async (req, res) => {
     try {
-        console.log(req.body);
         const { studentId } = req.body;
         const { name, phone, email } = req.body.values
-        console.log(name, phone, studentId);
         const update = await Student.findByIdAndUpdate({ _id: studentId }, { $set: { name: name, phone: phone } })
-        console.log(update);
         const updatedprofile = await Student.findOne({ _id: studentId });
-        console.log(updatedprofile);
         res.status(200).json({ message: "success", updatedprofile })
 
     } catch (error) {
@@ -446,7 +417,7 @@ export const editStudentProfile = async (req, res) => {
 export const learnCourse = async (req, res) => {
 
     try {
-        console.log("hai learning Course");
+
         const { courseId } = req.params;
         const course = await Course.findOne({ _id: courseId }).populate('category').populate('instructorId').populate('modules.module');
         res.status(200).json({ course })
@@ -461,15 +432,10 @@ export const learnCourse = async (req, res) => {
 
 export const rateCourse = async (req, res) => {
     const { rated, review, courseId, studentId } = req.body
-    console.log(req.body, "body for rating");
-    console.log(rated, "this is ratin");
     const notAlreadyrated = await EnrolledCourse.findOne({ courseId: courseId, studentId: studentId, rating: { $exists: false } });
     if (notAlreadyrated) {
         const rate = await EnrolledCourse.findOneAndUpdate({ courseId: courseId, studentId: studentId }, { $set: { rating: rated, review: review } });
-        console.log(rate);
         res.status(200).json({ rated })
-
-
     }
     else {
         console.log("AlreadyRated");
@@ -481,7 +447,6 @@ export const rateCourse = async (req, res) => {
 export const checkratingStatus = async (req, res) => {
     const courseId = req.query.courseId;
     const studentId = req.query.studentId;
-    console.log("checking already rated", courseId, studentId);
     const ratedOrNot = await EnrolledCourse.findOne({ courseId: courseId, studentId: studentId, rating: { $exists: true } });
 
     if (ratedOrNot) {
@@ -497,17 +462,10 @@ export const checkratingStatus = async (req, res) => {
 export const fetchCourseRating = async (req, res) => {
 
     const { courseId } = req.params;
-
-
-
     const documents = await EnrolledCourse.find({ courseId: courseId, rating: { $exists: true } });
     const ratingCount = await EnrolledCourse.find({ courseId: courseId, rating: { $exists: true } }).countDocuments()
     const totalRating = documents.reduce((sum, document) => sum + document.rating, 0);
-    console.log("RatingSum:", totalRating);
-    console.log("count", ratingCount);
     const averageRating = totalRating / ratingCount
-    console.log("avarage rating", averageRating);
-
     res.status(200).json({ averageRating, ratingCount })
 
 }
@@ -520,7 +478,6 @@ export const searchCourse = async (req, res) => {
         const search = await Course.find({
             courseName: { $regex: regex }
         }).populate('instructorId')
-        console.log(search);
         res.status(200).json({ search })
     } catch (error) {
         console.log(error);
@@ -531,9 +488,7 @@ export const searchCourse = async (req, res) => {
 
 export const categoryFilter = async (req, res) => {
     const { filterCategory } = req.params;
-    console.log(filterCategory, "filtering on this category");
     const filtered = await Course.find({ category: filterCategory }).populate('instructorId')
-    console.log(filtered, "these are courses filtered on ", filterCategory);
     res.status(200).json({ filtered })
 
 }
@@ -543,14 +498,8 @@ export const categoryFilter = async (req, res) => {
 export const fetchcoursereviews = async (req, res) => {
 
     const { courseId } = req.params;
-    console.log(courseId, "this is the course for finding reviews ");
-
     const ratenReviews = await EnrolledCourse.find({ courseId: courseId, review: { $exists: true } }).populate("studentId");
-    console.log(ratenReviews, "reviewed Students");
     const ratingCount = await EnrolledCourse.find({ courseId: courseId, rating: { $exists: true } }).countDocuments()
-    console.log("count", ratingCount);
-
-
     res.status(200).json({ ratenReviews, ratingCount })
 
 }
