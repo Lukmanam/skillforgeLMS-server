@@ -1,19 +1,17 @@
-import Student from '../models/studentModel.js';
 import Otp from '../models/otpModel.js';
-import Category from '../models/categoryModel.js'
 import Course from '../models/courseModel.js'
+import chatModel from '../models/chatModel.js';
+import Student from '../models/studentModel.js';
+import Category from '../models/categoryModel.js'
 import SavedCourse from '../models/SavedCourse.js';
+import { sendResetpassword } from '../utilities/otpControl.js'
+import EnrolledCourse from '../models/enrolledCourseModel.js';
+import notificationModel from '../models/notificationModel.js';
 import securePassword from '../utilities/securePassword.js';
+import { sendMailOtp } from '../utilities/otpControl.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
-import { sendMailOtp } from '../utilities/otpControl.js';
 import dotenv from 'dotenv';
-import { sendResetpassword } from '../utilities/otpControl.js'
-import { response } from 'express';
-import EnrolledCourse from '../models/enrolledCourseModel.js';
-import chatModel from '../models/chatModel.js';
-import notificationModel from '../models/notificationModel.js';
-
 dotenv.config()
 
 
@@ -21,7 +19,6 @@ dotenv.config()
 let otpId;
 export const studentSignup = async (req, res) => {
     try {
-        console.log("hellooo");
         const { name, email, phone, password } = req.body
         const emailexist = await Student.findOne({ email: email })
         const hashedPassword = await securePassword(password)
@@ -39,7 +36,6 @@ export const studentSignup = async (req, res) => {
             })
             const studentData = await student.save();
             otpId = await sendMailOtp(student.name, student.email, student._id);
-            console.log(otpId, "this is OTP DETAILS");
 
             return res.status(201).json({ message: `otp Has been send to ${email}`, student: studentData, otpId: otpId })
         }
@@ -55,22 +51,16 @@ export const studentSignup = async (req, res) => {
 export const emailOtpVerification = async (req, res) => {
     try {
         const { otp, studentId } = req.body;
-        console.log("studentId=", studentId);
-        console.log("OTP=", otp);
         const otpData = await Otp.find({ studentId: studentId });
-        console.log(otpData);
         const { expiresAt } = otpData[otpData.length - 1];
-        console.log(expiresAt, "This is expiry");
         const correctOtp = otpData[otpData.length - 1].otp;
 
         if (otpData && expiresAt < Date.now()) {
             return res.status(401).json({ message: "Otp Expired" });
         }
         if (correctOtp === otp) {
-            console.log("OTP is Correct");
             await Otp.deleteMany({ studentId: studentId })
             await Student.updateOne({ _id: studentId }, { $set: { isVerified: true } })
-            console.log("student Verified");
             res.status(200).json({ message: "Otp verified Successfully, Please Login to Continue" })
 
         }
@@ -89,22 +79,16 @@ export const emailOtpVerification = async (req, res) => {
 export const forgotemailOtopVerification = async (req, res) => {
     try {
         const { otp, studentId } = req.body;
-        console.log("studentId=", studentId);
-        console.log("OTP=", otp);
         const otpData = await Otp.find({ studentId: studentId });
-        console.log(otpData);
         const { expiresAt } = otpData[otpData.length - 1];
-        console.log(expiresAt, "This is expiry");
         const correctOtp = otpData[otpData.length - 1].otp;
 
         if (otpData && expiresAt < Date.now()) {
             return res.status(401).json({ message: "Otp Expired" });
         }
         if (correctOtp === otp) {
-            console.log("OTP is Correct");
             await Otp.deleteMany({ studentId: studentId })
             await Student.updateOne({ _id: studentId }, { $set: { isVerified: true } })
-            console.log("student Verified");
             res.status(200).json({ message: "Otp verified Successfully, Change your password Now" })
 
         }
@@ -120,14 +104,10 @@ export const forgotemailOtopVerification = async (req, res) => {
 
 export const resendStudentOtp = async (req, res) => {
     try {
-        console.log("haaai trying to resend otp");
         const { studentEmail } = req.body;
-        console.log(studentEmail);
         const { _id, name, email } = await Student.findOne({ email: studentEmail });
-        console.log("this is id", _id);
 
         const otpId = sendMailOtp(name, email, _id)
-        console.log(otpId);
         if (otpId) {
             res.status(200).json({ message: `Otp Has been resend to ${email} ` })
         }
@@ -145,19 +125,17 @@ export const studentLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
         const studentData = await Student.findOne({ email: email })
-        console.log(studentData);
 
         if (studentData) {
             const correctPassword = await bcrypt.compare(password, studentData.password);
 
-            console.log(correctPassword);
             if (correctPassword) {
                 if (studentData.isBlocked === false) {
                     const token = jwt.sign(
                         { name: studentData.name, email: studentData.email, id: studentData._id, role: "student" },
                         process.env.STUDENT_SECRET,
                         { expiresIn: "1h", });
-                    console.log(token);
+
                     res.status(200).json({ studentData, token, message: `welcome ${studentData.name}` })
                 }
                 else {
@@ -482,15 +460,15 @@ export const learnCourse = async (req, res) => {
 
 
 export const rateCourse = async (req, res) => {
-    const { rated,review, courseId, studentId } = req.body
+    const { rated, review, courseId, studentId } = req.body
     console.log(req.body, "body for rating");
     console.log(rated, "this is ratin");
     const notAlreadyrated = await EnrolledCourse.findOne({ courseId: courseId, studentId: studentId, rating: { $exists: false } });
     if (notAlreadyrated) {
-        const rate = await EnrolledCourse.findOneAndUpdate({ courseId: courseId, studentId: studentId }, { $set: { rating: rated,review:review} });
+        const rate = await EnrolledCourse.findOneAndUpdate({ courseId: courseId, studentId: studentId }, { $set: { rating: rated, review: review } });
         console.log(rate);
         res.status(200).json({ rated })
-      
+
 
     }
     else {
@@ -519,8 +497,8 @@ export const checkratingStatus = async (req, res) => {
 export const fetchCourseRating = async (req, res) => {
 
     const { courseId } = req.params;
-    
-    
+
+
 
     const documents = await EnrolledCourse.find({ courseId: courseId, rating: { $exists: true } });
     const ratingCount = await EnrolledCourse.find({ courseId: courseId, rating: { $exists: true } }).countDocuments()
@@ -534,28 +512,29 @@ export const fetchCourseRating = async (req, res) => {
 
 }
 
-export const searchCourse=async(req,res)=>{
+export const searchCourse = async (req, res) => {
     try {
-        
-        const {searchQuery}=req.params;
-        const regex=new RegExp(searchQuery,"i");
-        const search=await Course.find({courseName:{ $regex: regex }
+
+        const { searchQuery } = req.params;
+        const regex = new RegExp(searchQuery, "i");
+        const search = await Course.find({
+            courseName: { $regex: regex }
         }).populate('instructorId')
         console.log(search);
-        res.status(200).json({search})
+        res.status(200).json({ search })
     } catch (error) {
         console.log(error);
     }
 
-    
+
 }
 
-export const categoryFilter=async(req,res)=>{
-    const {filterCategory}=req.params;
-    console.log(filterCategory,"filtering on this category");
-    const filtered=await Course.find({category:filterCategory}).populate('instructorId')
-    console.log(filtered,"these are courses filtered on ",filterCategory);
-    res.status(200).json({filtered})
+export const categoryFilter = async (req, res) => {
+    const { filterCategory } = req.params;
+    console.log(filterCategory, "filtering on this category");
+    const filtered = await Course.find({ category: filterCategory }).populate('instructorId')
+    console.log(filtered, "these are courses filtered on ", filterCategory);
+    res.status(200).json({ filtered })
 
 }
 
@@ -566,11 +545,11 @@ export const fetchcoursereviews = async (req, res) => {
     const { courseId } = req.params;
     console.log(courseId, "this is the course for finding reviews ");
 
-    const ratenReviews = await EnrolledCourse.find({ courseId: courseId, review: {$exists:true}  }).populate("studentId");
-    console.log(ratenReviews,"reviewed Students");
+    const ratenReviews = await EnrolledCourse.find({ courseId: courseId, review: { $exists: true } }).populate("studentId");
+    console.log(ratenReviews, "reviewed Students");
     const ratingCount = await EnrolledCourse.find({ courseId: courseId, rating: { $exists: true } }).countDocuments()
-    console.log("count",ratingCount );
- 
+    console.log("count", ratingCount);
+
 
     res.status(200).json({ ratenReviews, ratingCount })
 
