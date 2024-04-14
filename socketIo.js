@@ -31,7 +31,6 @@ function socketConnection(server) {
 
 
         socket.on("send_message", (data) => {
-            console.log(data, "message")
             socket.to(123).emit("recieve_message", data);
         });
 

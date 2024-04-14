@@ -17,7 +17,6 @@ import dotenv from 'dotenv'
         })
         let otp = `${Math.floor(Math.random() * 9000)}`
         otp = otp.padStart(4, '0');
-        console.log(otp);
         const options = {
             from: process.env.EMAIL_USER,
             to: email,

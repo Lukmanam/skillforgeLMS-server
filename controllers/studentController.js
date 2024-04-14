@@ -41,7 +41,7 @@ export const studentSignup = async (req, res) => {
         }
 
     } catch (error) {
-        console.log("this is error", error.message);
+        console.log(error.message);
         res.status(500).json({ message: "Internal Server Error" })
 
     }
@@ -436,9 +436,6 @@ export const rateCourse = async (req, res) => {
     if (notAlreadyrated) {
         const rate = await EnrolledCourse.findOneAndUpdate({ courseId: courseId, studentId: studentId }, { $set: { rating: rated, review: review } });
         res.status(200).json({ rated })
-    }
-    else {
-        console.log("AlreadyRated");
     }
 }
 

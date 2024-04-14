@@ -6,7 +6,6 @@ async function dbconnect() {
     const mongourl = process.env.MONGO_URL
     try {
         if (!mongourl) {
-            console.log('MongoDB URI is not defined');
             return;
         }
         await mongoose.connect(mongourl);

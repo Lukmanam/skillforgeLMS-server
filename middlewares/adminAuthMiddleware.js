@@ -4,7 +4,6 @@ import jwt, { decode } from 'jsonwebtoken';
 const adminAuthMiddleware = (req, res, next) => {
     try {
         const token = req.header('autherization');
-        console.log(req);
         if (!token) {
             return res.status(401).json({ message: 'Unauthorized: Missing token' });
         }
